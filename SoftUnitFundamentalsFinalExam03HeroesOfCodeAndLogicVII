@@ -1,0 +1,98 @@
+using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Text.RegularExpressions;
+
+namespace SoftUnitFundamentalsFinalExam
+{
+    class Program
+    {
+        private static string casint;
+
+        static void Main(string[] args)
+        {
+            //SoftUnitFundamentalsFinalExam03HeroesOfCodeAndLogicVII
+
+            Dictionary<string, int[]> partyList = new Dictionary<string, int[]>();
+
+            int n = int.Parse(Console.ReadLine());
+
+            for (int i = 0; i < n; i++)
+            {
+                string[] addHerro = Console.ReadLine().Split(' ', StringSplitOptions.RemoveEmptyEntries).ToArray(); //key = {hero name}, [0]{HP} [1]{MP} 
+                partyList.Add(addHerro[0], new int[] { int.Parse(addHerro[1]), int.Parse(addHerro[2]) });
+            }
+
+            while (true)
+            {
+                string[] command = Console.ReadLine().Split(" - ", StringSplitOptions.RemoveEmptyEntries).ToArray();//CastSpell – {hero name} – {MP needed} – {spell name} 
+                if (command[0] == "End")
+                {
+                    break;
+                }
+                switch (command[0])
+                {
+                    case "CastSpell"://CastSpell – {hero name} – {MP needed} – {spell name} 
+                        if (partyList[command[1]][1] - int.Parse(command[2]) < 0)
+                        {
+                            Console.WriteLine($"{command[1]} does not have enough MP to cast {command[3]}!");
+                            continue;
+                        }
+                        partyList[command[1]][1] -= int.Parse(command[2]);//key = {hero name}, [0]{HP} [1]{MP} 
+                        Console.WriteLine($"{command[1]} has successfully cast {command[3]} and now has {partyList[command[1]][1]} MP!");
+                        break;
+
+                    case "TakeDamage"://TakeDamage – {hero name} – {damage} – {attacker}
+                        string name = command[1];
+                        int damage = int.Parse(command[2]);
+                        string attacker = command[3];
+                        partyList[name][0] -= damage;
+                        int health = partyList[name][0];
+                        if (health > 0)
+                        {
+                            Console.WriteLine($"{name} was hit for {damage} HP by {attacker} and now has {health} HP left!");
+                        }
+                        else
+                        {
+                            partyList.Remove(name);
+                            Console.WriteLine($"{name} has been killed by {attacker}!");
+                        }
+                        break;
+
+                    case "Recharge"://Recharge – {hero name} – {amount}
+                        string nameMP = command[1];
+                        int amount = int.Parse(command[2]);
+                        if (partyList[nameMP][1] + amount > 200)
+                        {
+                            amount = 200 - partyList[nameMP][1];
+                        }
+                        partyList[nameMP][1] += amount;
+                        Console.WriteLine($"{nameMP} recharged for {amount} MP!");
+                        break;
+
+                    case "Heal"://Heal – {hero name} – {amount}
+                        string nameHeal = command[1];
+                        int amountHeal = int.Parse(command[2]);
+                        if (partyList[nameHeal][0] + amountHeal > 100)
+                        {
+                            amountHeal = 100 - partyList[nameHeal][0];
+                        }
+                        partyList[nameHeal][0] += amountHeal;
+                        Console.WriteLine($"{nameHeal} healed for {amountHeal} HP!");
+                        break;
+                }
+
+            }
+
+            foreach (var item in partyList.OrderBy(x=>x.Key).OrderByDescending(x=>x.Value[0]))
+            {
+                Console.WriteLine(item.Key);
+                Console.WriteLine($"  HP: {item.Value[0]}");
+                Console.WriteLine($"  MP: {item.Value[1]}");
+            }
+
+            //
+        }
+    }
+}
